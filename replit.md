@@ -33,6 +33,7 @@ Premium, responsive hotel website for MC-LEA Hotel & Suite in Port Harcourt, wit
 - Hotel facts that were not supplied are kept as explicit placeholders in the `HOTEL` and content constants rather than fabricated.
 - Temporary Pexels visuals carry an on-page preview label so they are not presented as official MC-LEA photography.
 - The site is a single-page experience with anchor navigation so the full hospitality story stays fast and easy to scan.
+- The guest journey takes cues from established Nigerian hotel sites: availability is visible early, the story remains editorial, and location/contact reassurance stays close to conversion actions.
 
 ## Product
 

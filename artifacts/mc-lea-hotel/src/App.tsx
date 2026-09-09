@@ -37,12 +37,19 @@ const HOTEL = {
   shortName: 'MC-LEA',
   address: 'Mandella Estate, H18 11 Road, off SARS Road, Port Harcourt 500101, Rivers State, Nigeria.',
   shortAddress: 'Mandella Estate · H18 11 Road · off SARS Road',
+  locationLabel: 'Mandella Estate, Port Harcourt',
   phone: '[Phone number to be supplied]',
   email: '[Email address to be supplied]',
   whatsappNumber: '2340000000000',
   whatsappLabel: '[WhatsApp contact to be supplied]',
   directions: 'https://www.google.com/maps/search/?api=1&query=MC-LEA+Hotel+and+Suite+Mandella+Estate+Port+Harcourt',
 };
+
+const HOSPITALITY_NOTES = [
+  { title: 'Choose a room', text: 'Browse the room categories, then ask the hotel team about the best fit for your visit.' },
+  { title: 'Share your dates', text: 'Include arrival, departure and guest count so the team can check the right availability.' },
+  { title: 'Keep it clear', text: 'Your message starts an enquiry. Any stay details remain to be confirmed by the hotel team.' },
+];
 
 const IMAGES = {
   hero: 'https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg?auto=compress&cs=tinysrgb&w=2200',
@@ -60,6 +67,16 @@ type Room = {
   details: string[];
   note: string;
 };
+
+type EnquiryDraft = {
+  checkIn: string;
+  checkOut: string;
+  guests: string;
+  room: string;
+  note: string;
+};
+
+type BookingPrefill = Partial<EnquiryDraft>;
 
 const ROOMS: Room[] = [
   {
@@ -145,7 +162,7 @@ function SectionIntro({ eyebrow, title, copy, align = 'left' }: { eyebrow: strin
   );
 }
 
-function Header({ onBook }: { onBook: (room?: string) => void }) {
+function Header({ onBook }: { onBook: (prefill?: BookingPrefill) => void }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -215,6 +232,10 @@ function Hero({ onBook }: { onBook: () => void }) {
               Explore rooms <ArrowDown size={15} />
             </a>
           </div>
+           <div className="reveal mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[.12em] text-white/60">
+             <span className="inline-flex items-center gap-2"><Check size={13} className="text-[#dfc18d]" /> Enquiry first</span>
+             <span className="inline-flex items-center gap-2"><ShieldCheck size={13} className="text-[#dfc18d]" /> No payment here</span>
+           </div>
         </div>
         <div className="mt-20 flex items-center gap-4 text-white/60 sm:mt-24">
           <span className="h-px w-10 bg-[#c2a875]" />
@@ -225,33 +246,61 @@ function Hero({ onBook }: { onBook: () => void }) {
   );
 }
 
-function BookingBar({ onBook }: { onBook: (room?: string) => void }) {
+function BookingBar({ onBook }: { onBook: (prefill?: BookingPrefill) => void }) {
+  const [details, setDetails] = useState<BookingPrefill>({ checkIn: '', checkOut: '', guests: '1', room: '' });
   return (
     <section className="relative z-20 -mt-1 bg-[#eeeadf] px-5 py-5 sm:px-8 lg:px-12" aria-label="Booking enquiry">
       <div className="mx-auto flex max-w-[1320px] flex-col gap-5 lg:flex-row lg:items-end lg:gap-6">
         <div className="mr-auto min-w-[155px]">
-          <div className="eyebrow mb-2 text-[#a07d48]">Plan your stay</div>
+          <div className="eyebrow mb-2 text-[#a07d48]">Start an enquiry</div>
           <p className="font-display text-2xl text-[#34312b]">Check availability</p>
+          <p className="mt-2 text-[11px] leading-5 text-[#81776a]">Dates and guests help us prepare a useful reply.</p>
         </div>
         <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-4 lg:gap-6">
           <label className="flex flex-col gap-2 text-[#6d675e]">
             <span className="font-mono-label text-[9px] uppercase tracking-[.13em]">Check-in</span>
-            <span className="flex items-center gap-2 border-b border-[#cfc3b0] pb-2 text-[13px] text-[#403b33]"><CalendarDays size={15} className="text-[#aa8855]" /><input type="date" className="min-w-0 bg-transparent outline-none" aria-label="Check-in date" data-testid="input-bar-checkin" /></span>
+            <span className="flex items-center gap-2 border-b border-[#cfc3b0] pb-2 text-[13px] text-[#403b33]"><CalendarDays size={15} className="text-[#aa8855]" /><input type="date" value={details.checkIn} onChange={(event) => setDetails((current) => ({ ...current, checkIn: event.target.value }))} className="min-w-0 bg-transparent outline-none" aria-label="Check-in date" data-testid="input-bar-checkin" /></span>
           </label>
           <label className="flex flex-col gap-2 text-[#6d675e]">
             <span className="font-mono-label text-[9px] uppercase tracking-[.13em]">Check-out</span>
-            <span className="flex items-center gap-2 border-b border-[#cfc3b0] pb-2 text-[13px] text-[#403b33]"><CalendarDays size={15} className="text-[#aa8855]" /><input type="date" className="min-w-0 bg-transparent outline-none" aria-label="Check-out date" data-testid="input-bar-checkout" /></span>
+            <span className="flex items-center gap-2 border-b border-[#cfc3b0] pb-2 text-[13px] text-[#403b33]"><CalendarDays size={15} className="text-[#aa8855]" /><input type="date" value={details.checkOut} onChange={(event) => setDetails((current) => ({ ...current, checkOut: event.target.value }))} className="min-w-0 bg-transparent outline-none" aria-label="Check-out date" data-testid="input-bar-checkout" /></span>
           </label>
           <label className="flex flex-col gap-2 text-[#6d675e]">
             <span className="font-mono-label text-[9px] uppercase tracking-[.13em]">Guests</span>
-            <span className="flex items-center gap-2 border-b border-[#cfc3b0] pb-2 text-[13px] text-[#403b33]"><Users size={15} className="text-[#aa8855]" /><select className="w-full bg-transparent outline-none" aria-label="Number of guests" defaultValue="1" data-testid="select-bar-guests"><option value="1">1 guest</option><option value="2">2 guests</option><option value="3">3 guests</option><option value="4">4 guests</option><option value="5">5+ guests</option></select></span>
+            <span className="flex items-center gap-2 border-b border-[#cfc3b0] pb-2 text-[13px] text-[#403b33]"><Users size={15} className="text-[#aa8855]" /><select className="w-full bg-transparent outline-none" aria-label="Number of guests" value={details.guests} onChange={(event) => setDetails((current) => ({ ...current, guests: event.target.value }))} data-testid="select-bar-guests"><option value="1">1 guest</option><option value="2">2 guests</option><option value="3">3 guests</option><option value="4">4 guests</option><option value="5">5+ guests</option></select></span>
           </label>
           <label className="flex flex-col gap-2 text-[#6d675e]">
             <span className="font-mono-label text-[9px] uppercase tracking-[.13em]">Room preference</span>
-            <span className="flex items-center gap-2 border-b border-[#cfc3b0] pb-2 text-[13px] text-[#403b33]"><BedDouble size={15} className="text-[#aa8855]" /><select className="w-full bg-transparent outline-none" aria-label="Room preference" defaultValue="" data-testid="select-bar-room"><option value="">Any available</option>{ROOMS.map((room) => <option key={room.name} value={room.name}>{room.name}</option>)}</select></span>
+            <span className="flex items-center gap-2 border-b border-[#cfc3b0] pb-2 text-[13px] text-[#403b33]"><BedDouble size={15} className="text-[#aa8855]" /><select className="w-full bg-transparent outline-none" aria-label="Room preference" value={details.room} onChange={(event) => setDetails((current) => ({ ...current, room: event.target.value }))} data-testid="select-bar-room"><option value="">Any available</option>{ROOMS.map((room) => <option key={room.name} value={room.name}>{room.name}</option>)}</select></span>
           </label>
         </div>
-        <button type="button" onClick={() => onBook()} className="focus-ring flex min-h-12 shrink-0 items-center justify-center gap-4 bg-[#34312b] px-6 text-[11px] font-semibold tracking-[.1em] text-[#f7f2e8] transition-colors hover:bg-[#b08c55]" data-testid="button-check-availability">Check availability <ArrowRight size={15} /></button>
+        <button type="button" onClick={() => onBook(details)} className="focus-ring flex min-h-12 shrink-0 items-center justify-center gap-4 bg-[#34312b] px-6 text-[11px] font-semibold tracking-[.1em] text-[#f7f2e8] transition-colors hover:bg-[#b08c55]" data-testid="button-check-availability">Prepare enquiry <ArrowRight size={15} /></button>
+      </div>
+      <div className="mx-auto mt-4 flex max-w-[1320px] items-center gap-2 text-[10px] uppercase tracking-[.1em] text-[#897961]"><ShieldCheck size={14} className="text-[#a8844f]" /> Availability is confirmed by the hotel team · no payment is taken here</div>
+    </section>
+  );
+}
+
+function WhatToExpect() {
+  return (
+    <section className="border-b border-[#d8cebf] bg-[#f5f1e9] px-5 py-10 sm:px-8 lg:px-12" aria-labelledby="expect-title" data-testid="section-what-to-expect">
+      <div className="mx-auto grid max-w-[1320px] gap-8 lg:grid-cols-[.7fr_1.3fr] lg:items-center lg:gap-16">
+        <div>
+          <div className="eyebrow text-[#a07d48]">A simple start</div>
+          <h2 id="expect-title" className="mt-3 font-display text-3xl leading-tight text-[#34312b]">What to expect</h2>
+          <p className="mt-2 max-w-sm text-[12px] leading-5 text-[#81776a]">A clear path from first enquiry to a stay that feels right for you.</p>
+        </div>
+        <ol className="grid gap-6 sm:grid-cols-3 sm:gap-0">
+          {HOSPITALITY_NOTES.map((item, index) => (
+            <li key={item.title} className={`relative flex gap-4 sm:block sm:px-6 ${index === 0 ? 'sm:pl-0' : ''} ${index < HOSPITALITY_NOTES.length - 1 ? 'sm:border-r sm:border-[#d8cebf]' : ''}`} data-testid={`item-expect-${index}`}>
+              <span className="font-mono-label text-[10px] text-[#ab8751]">0{index + 1}</span>
+              <div className="sm:mt-5">
+                <h3 className="font-display text-xl text-[#403b33]">{item.title}</h3>
+                <p className="mt-2 max-w-[220px] text-[12px] leading-5 text-[#81776a]">{item.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
@@ -281,7 +330,7 @@ function Intro() {
   );
 }
 
-function Rooms({ onBook }: { onBook: (room?: string) => void }) {
+function Rooms({ onBook }: { onBook: (prefill?: BookingPrefill) => void }) {
   return (
     <section id="rooms" className="bg-[#e9e1d5] px-5 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-36" data-testid="section-rooms">
       <div className="mx-auto max-w-[1320px]">
@@ -307,8 +356,8 @@ function Rooms({ onBook }: { onBook: (room?: string) => void }) {
                   {room.details.map((detail) => <li key={detail} className="flex items-center gap-2"><Check size={13} className="text-[#b08a53]" />{detail}</li>)}
                 </ul>
                 <div className="mt-7 flex items-center gap-5">
-                  <button type="button" onClick={() => onBook(room.name)} className="focus-ring inline-flex items-center gap-3 bg-[#37332d] px-4 py-3 text-[10px] font-semibold tracking-[.1em] text-[#f6f0e6] transition-colors hover:bg-[#ad8954]" data-testid={`button-view-room-${index}`}>View room <ArrowRight size={14} /></button>
-                  <button type="button" onClick={() => onBook(room.name)} className="focus-ring text-[10px] font-semibold tracking-[.1em] text-[#76634a] underline decoration-[#b18c57] underline-offset-4 transition-colors hover:text-[#a17b44]" data-testid={`button-book-room-${index}`}>Book now</button>
+                   <button type="button" onClick={() => onBook({ room: room.name })} className="focus-ring inline-flex items-center gap-3 bg-[#37332d] px-4 py-3 text-[10px] font-semibold tracking-[.1em] text-[#f6f0e6] transition-colors hover:bg-[#ad8954]" data-testid={`button-view-room-${index}`}>Enquire for this room <ArrowRight size={14} /></button>
+                   <button type="button" onClick={() => onBook({ room: room.name })} className="focus-ring text-[10px] font-semibold tracking-[.1em] text-[#76634a] underline decoration-[#b18c57] underline-offset-4 transition-colors hover:text-[#a17b44]" data-testid={`button-book-room-${index}`}>Add to enquiry</button>
                 </div>
                 <p className="mt-6 font-mono-label text-[8px] uppercase tracking-[.08em] text-[#a2988b]">{room.note}</p>
               </div>
@@ -473,7 +522,7 @@ function LocationContact({ onBook }: { onBook: () => void }) {
         <div>
           <div className="eyebrow mb-5 text-[#d0b178]">Find your way here</div>
           <h2 className="font-display text-balance text-4xl leading-[1.05] tracking-[-.035em] sm:text-5xl md:text-6xl">A place to arrive.<br /><em className="font-normal text-[#d0b178]">A world apart.</em></h2>
-          <p className="mt-7 max-w-md text-[14px] leading-7 text-white/60">Make your way to MC-LEA Hotel &amp; Suite in Mandella Estate, Port Harcourt. For a booking enquiry or arrival details, our contact information is ready below.</p>
+           <p className="mt-7 max-w-md text-[14px] leading-7 text-white/60">Make your way to MC-LEA Hotel &amp; Suite in Mandella Estate, Port Harcourt. Use the address below to plan your route, then enquire directly when you are ready.</p>
           <div className="mt-10 flex flex-wrap gap-3">
             <button type="button" onClick={onBook} className="focus-ring inline-flex min-h-12 items-center gap-4 bg-[#c2a875] px-5 text-[11px] font-semibold tracking-[.11em] text-[#302d28] transition-colors hover:bg-[#dec697]" data-testid="button-contact-book">Book your stay <ArrowRight size={15} /></button>
             <a href={HOTEL.directions} target="_blank" rel="noreferrer" className="focus-ring inline-flex min-h-12 items-center gap-3 border border-white/30 px-5 text-[11px] font-semibold tracking-[.11em] text-white transition-colors hover:border-white" data-testid="link-directions"><Navigation size={14} /> Get directions</a>
@@ -481,14 +530,20 @@ function LocationContact({ onBook }: { onBook: () => void }) {
         </div>
         <div className="relative overflow-hidden bg-[#3a3630] p-7 sm:p-10">
           <div className="absolute right-0 top-0 h-36 w-36 border-l border-b border-[#8d744e]/40" />
-          <MapPin size={23} strokeWidth={1.2} className="text-[#c2a875]" />
+           <div className="flex items-center justify-between gap-4">
+             <MapPin size={23} strokeWidth={1.2} className="text-[#c2a875]" />
+             <span className="font-mono-label text-[9px] uppercase tracking-[.12em] text-white/35">Location &amp; contact</span>
+           </div>
           <p className="mt-8 max-w-md font-display text-2xl leading-snug text-white sm:text-3xl">{HOTEL.name}</p>
-          <p className="mt-5 max-w-md text-[13px] leading-6 text-white/60" data-testid="text-hotel-address">{HOTEL.address}</p>
+           <p className="mt-2 text-[11px] uppercase tracking-[.12em] text-[#c2a875]">{HOTEL.locationLabel}</p>
+           <p className="mt-4 max-w-md text-[13px] leading-6 text-white/60" data-testid="text-hotel-address">{HOTEL.address}</p>
           <button type="button" onClick={copyAddress} className="focus-ring mt-6 inline-flex items-center gap-2 text-[10px] font-semibold tracking-[.11em] text-[#d2b57f] hover:text-white" data-testid="button-copy-address">{copied ? <Check size={14} /> : <Copy size={14} />} {copied ? 'Address copied' : 'Copy address'}</button>
           <div className="my-9 h-px bg-white/10" />
+           <p className="mb-6 max-w-md text-[12px] leading-5 text-white/50">For availability, arrival planning or room preference, use the enquiry form. Contact details below are shown as supplied placeholders until the hotel provides the final information.</p>
           <div className="grid gap-5 sm:grid-cols-2">
             <div><div className="eyebrow mb-2 text-white/35">Phone</div><p className="text-[12px] text-white/65" data-testid="text-phone-placeholder">{HOTEL.phone}</p></div>
             <div><div className="eyebrow mb-2 text-white/35">WhatsApp</div><p className="text-[12px] text-white/65" data-testid="text-whatsapp-placeholder">{HOTEL.whatsappLabel}</p></div>
+             <div><div className="eyebrow mb-2 text-white/35">Email</div><p className="text-[12px] text-white/65" data-testid="text-email-placeholder">{HOTEL.email}</p></div>
           </div>
           <button type="button" onClick={() => openWhatsApp(`Hello MC-LEA Hotel & Suite, I would like to enquire about a stay at ${HOTEL.address}`)} className="focus-ring mt-9 inline-flex items-center gap-3 border-b border-[#c2a875] pb-2 text-[11px] font-semibold tracking-[.11em] text-[#dbc08d] hover:text-white" data-testid="button-contact-whatsapp"><MessageCircle size={15} /> Chat on WhatsApp</button>
           <p className="mt-5 font-mono-label text-[8px] uppercase tracking-[.09em] text-white/35">WhatsApp link uses a configurable placeholder until the hotel supplies its number.</p>
@@ -538,9 +593,15 @@ function Footer() {
   );
 }
 
-function BookingModal({ initialRoom, onClose }: { initialRoom?: string; onClose: () => void }) {
+function BookingModal({ initialValues, onClose }: { initialValues?: BookingPrefill; onClose: () => void }) {
   const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ checkIn: '', checkOut: '', guests: '1', room: initialRoom ?? '', note: '' });
+  const [form, setForm] = useState<EnquiryDraft>({
+    checkIn: initialValues?.checkIn ?? '',
+    checkOut: initialValues?.checkOut ?? '',
+    guests: initialValues?.guests ?? '1',
+    room: initialValues?.room ?? '',
+    note: initialValues?.note ?? '',
+  });
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
@@ -549,6 +610,7 @@ function BookingModal({ initialRoom, onClose }: { initialRoom?: string; onClose:
   }, [onClose]);
 
   const update = (key: keyof typeof form, value: string) => setForm((current) => ({ ...current, [key]: value }));
+  const displayDate = (value: string) => value ? value.split('-').reverse().join('/') : 'To be confirmed';
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const message = [`Hello MC-LEA Hotel & Suite, I would like to enquire about a stay.`, `Check-in: ${form.checkIn || 'To be confirmed'}`, `Check-out: ${form.checkOut || 'To be confirmed'}`, `Guests: ${form.guests}`, `Room preference: ${form.room || 'Any available room'}`, form.note ? `Note: ${form.note}` : ''].filter(Boolean).join('\n');
@@ -563,7 +625,18 @@ function BookingModal({ initialRoom, onClose }: { initialRoom?: string; onClose:
         <div className="eyebrow text-[#a07d48]">Your next stay</div>
         <h2 id="booking-title" className="mt-4 max-w-lg font-display text-4xl leading-tight text-[#302d28] sm:text-5xl">Let’s make room for you.</h2>
         <p className="mt-4 max-w-lg text-[13px] leading-6 text-[#726a5e]">Share a few details and we’ll prepare an enquiry for the MC-LEA team via WhatsApp. No payment is taken here.</p>
-        {submitted && <div className="mt-6 flex items-start gap-3 border border-[#cdb88d] bg-[#ede2c9] p-4 text-[12px] leading-5 text-[#554632]" role="status" data-testid="status-booking-sent"><Check size={17} className="mt-0.5 shrink-0 text-[#97733f]" /> Your enquiry is ready in WhatsApp. The contact currently uses a clearly marked placeholder until the hotel supplies its number.</div>}
+         {submitted && <div className="mt-6 flex items-start gap-3 border border-[#cdb88d] bg-[#ede2c9] p-4 text-[12px] leading-5 text-[#554632]" role="status" data-testid="status-booking-sent"><Check size={17} className="mt-0.5 shrink-0 text-[#97733f]" /> Your enquiry is ready in WhatsApp. The contact currently uses a clearly marked placeholder until the hotel supplies its number.</div>}
+         <div className="mt-7 border border-[#ddd2c2] bg-[#eee7da] p-4 sm:p-5" aria-live="polite" data-testid="summary-booking-enquiry">
+           <div className="flex items-center justify-between gap-4">
+             <div className="eyebrow text-[#a07d48]">Enquiry summary</div>
+             <span className="font-mono-label text-[9px] uppercase tracking-[.1em] text-[#9a8d7d]">Not a reservation</span>
+           </div>
+           <div className="mt-4 grid gap-4 text-[12px] text-[#554d42] sm:grid-cols-3">
+             <div><div className="font-mono-label text-[9px] uppercase tracking-[.1em] text-[#9a8d7d]">Dates</div><p className="mt-1">{displayDate(form.checkIn)} → {displayDate(form.checkOut)}</p></div>
+             <div><div className="font-mono-label text-[9px] uppercase tracking-[.1em] text-[#9a8d7d]">Guests</div><p className="mt-1">{form.guests} {form.guests === '1' ? 'guest' : 'guests'}</p></div>
+             <div><div className="font-mono-label text-[9px] uppercase tracking-[.1em] text-[#9a8d7d]">Room</div><p className="mt-1">{form.room || 'Any available room'}</p></div>
+           </div>
+         </div>
         <form className="mt-8 grid gap-5 sm:grid-cols-2" onSubmit={submit}>
           <label className="flex flex-col gap-2 text-[11px] font-semibold tracking-[.08em] text-[#5e574c]">Check-in<input type="date" value={form.checkIn} onChange={(event) => update('checkIn', event.target.value)} className="min-h-12 border border-[#d1c5b5] bg-[#fbf8f2] px-3 text-[13px] font-normal tracking-normal text-[#39352e] outline-none focus:border-[#ae8852] focus:ring-1 focus:ring-[#ae8852]" data-testid="input-modal-checkin" /></label>
           <label className="flex flex-col gap-2 text-[11px] font-semibold tracking-[.08em] text-[#5e574c]">Check-out<input type="date" value={form.checkOut} onChange={(event) => update('checkOut', event.target.value)} className="min-h-12 border border-[#d1c5b5] bg-[#fbf8f2] px-3 text-[13px] font-normal tracking-normal text-[#39352e] outline-none focus:border-[#ae8852] focus:ring-1 focus:ring-[#ae8852]" data-testid="input-modal-checkout" /></label>
@@ -581,8 +654,8 @@ function BookingModal({ initialRoom, onClose }: { initialRoom?: string; onClose:
 }
 
 function Home() {
-  const [booking, setBooking] = useState<{ open: boolean; room?: string }>({ open: false });
-  const openBooking = (room?: string) => setBooking({ open: true, room });
+  const [booking, setBooking] = useState<{ open: boolean; prefill?: BookingPrefill }>({ open: false });
+  const openBooking = (prefill?: BookingPrefill) => setBooking({ open: true, prefill });
   useEffect(() => {
     const elements = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } }), { threshold: 0.12 });
@@ -612,6 +685,7 @@ function Home() {
       <main>
         <Hero onBook={() => openBooking()} />
         <BookingBar onBook={openBooking} />
+        <WhatToExpect />
         <Intro />
         <Rooms onBook={openBooking} />
         <Amenities />
@@ -622,7 +696,7 @@ function Home() {
         <FinalCta onBook={() => openBooking()} />
       </main>
       <Footer />
-      {booking.open && <BookingModal initialRoom={booking.room} onClose={() => setBooking({ open: false })} />}
+       {booking.open && <BookingModal initialValues={booking.prefill} onClose={() => setBooking({ open: false })} />}
     </div>
   );
 }
