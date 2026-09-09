@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "MC-LEA Hotel & Suite"
+description = "A premium, responsive hotel website for MC-LEA Hotel & Suite in Port Harcourt, with room discovery, booking enquiries, gallery browsing, and contact actions."
+version = "1.0.0"
+id = "artifacts/mc-lea-hotel"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23802
+
+[services.development]
+run = "pnpm --filter @workspace/mc-lea-hotel run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mc-lea-hotel", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/mc-lea-hotel/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23802"
+BASE_PATH = "/"

@@ -1,6 +1,6 @@
-# [Project name]
+# MC-LEA Hotel & Suite
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Premium, responsive hotel website for MC-LEA Hotel & Suite in Port Harcourt, with room discovery, booking enquiries, gallery browsing, and contact actions.
 
 ## Run & Operate
 
@@ -10,6 +10,7 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/mc-lea-hotel run typecheck` — typecheck the hotel website
 
 ## Stack
 
@@ -22,23 +23,31 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/mc-lea-hotel/src/App.tsx` — hotel page sections, structured hotel/room/gallery content, booking enquiry modal, and interactions
+- `artifacts/mc-lea-hotel/src/index.css` — shared palette, typography, responsive styling, reveal motion, focus states, and reduced-motion rules
+- `artifacts/mc-lea-hotel/.replit-artifact/artifact.toml` — web artifact routing and workflow configuration
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first release is frontend-only; booking enquiries are prepared as WhatsApp messages instead of being treated as confirmed reservations.
+- Hotel facts that were not supplied are kept as explicit placeholders in the `HOTEL` and content constants rather than fabricated.
+- Temporary Pexels visuals carry an on-page preview label so they are not presented as official MC-LEA photography.
+- The site is a single-page experience with anchor navigation so the full hospitality story stays fast and easy to scan.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Guests can browse rooms, view temporary gallery imagery in a lightbox, cycle through clearly marked review placeholders, copy the hotel address, open directions, and prepare a booking enquiry.
+- The responsive navigation, booking form, and contact actions are designed for desktop, tablet, and mobile use.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep the visual language calm, premium, clean, trustworthy, and understated.
+- Never invent MC-LEA prices, reviews, awards, facilities, room specifications, phone numbers, email addresses, or social accounts.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Replace the placeholder WhatsApp number, phone, email, amenity data, room details, and preview images before treating the site as production-ready.
+- The website workflow provides `PORT` and `BASE_PATH`; use the managed artifact workflow rather than starting Vite directly.
 
 ## Pointers
 
